@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Payments Tools 2.0</title>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+		<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>		
+		<script src="BigInteger.js"></script>
+		<script src="iban.js"></script>
+	</head>
+	<body>
+		<section class="section">
+			<div class="container">
+
+				<div class="columns">
+					<div class="column">
+						<h1 class="title">IBAN Validator</h1>
+						<h2 class="subtitle">Enter an IBAN to check that it looks valid</h2>
+
+						<form id="ibanValidate">
+
+							<div class="field is-horizontal">
+								<div class="field-label is-normal">
+									<label class="label">IBAN</label>
+								</div>
+								<div class="field-body">
+									<div class="field has-addons">
+										<p class="control is-expanded">
+											<input id="ibanValidateInput" class="input" type="text" placeholder="GB98ABBY09022210616932">
+										</p>
+										<div class="control">
+											<button type=submit class="button is-primary">
+												Validate
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+						</form>
+
+						<br/>
+						<div id="ibanValidateOutput" class="notification is-invisible">
+							Ninja
+						</div>
+
+					</div>
+
+					<div class="column">
+						<h1 class="title">IBAN Generator</h1>
+						<h2 class="subtitle">Enter account details to generate the appropriate IBAN for a UK bank account</h2>
+
+						<form id="ibanGenerate">
+
+							<div class="field is-horizontal">
+								<div class="field-label is-normal">
+									<label class="label">Country</label>
+								</div>
+								<div class="field-body">
+									<div class="field">
+										<div class="control has-icons-left">
+											<div id="ibanGenerateCountry" class="select is-loading">
+												<select name="country">
+												</select>
+											</div>
+											<span class="icon is-left">
+												<i class="fas fa-globe"></i>
+											</span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="field is-horizontal">
+								<div class="field-label is-normal">
+									<label class="label">Bank</label>
+								</div>
+								<div class="field-body">
+									<div class="field">
+										<div class="control has-icons-left">
+											<input name="bank" class="input" type="text" value="ABBY">
+												<span class="icon is-left">
+												<i class="fas fa-landmark"></i>
+											</span>
+										</div>
+										<p class="help">This is first 4 characters of the bank's Swift Code</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="field is-horizontal">
+								<div class="field-label is-normal">
+									<label class="label">Sort Code</label>
+								</div>
+								<div class="field-body">
+									<div class="field">
+										<div class="control has-icons-left">
+											<input name="sortcode" class="input" type="text" placeholder="12-34-56">
+												<span class="icon is-left">
+												<i class="fas fa-folder"></i>
+											</span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="field is-horizontal">
+								<div class="field-label is-normal">
+									<label class="label">Account Number</label>
+								</div>
+								<div class="field-body">
+									<div class="field">
+										<div class="control has-icons-left">
+											<input name="accountNumber" class="input" type="text" placeholder="12345678">
+												<span class="icon is-left">
+												<i class="fas fa-piggy-bank"></i>
+											</span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="field is-horizontal">
+								<div class="field-label">
+									<!-- Left empty for spacing -->
+								</div>
+								<div class="field-body">
+									<div class="field">
+										<div class="control">
+											<button type=submit class="button is-primary">
+												Generate
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</form>
+
+						<br/>
+
+						<div id="ibanGenerateOutput" class="notification is-invisible">
+							Ghost
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+		</section>
+
+		<script type="text/javascript">
+			
+			$(function() {
+				console.log( "Adding countries" );
+				// handle loading countries into dropdown
+				for (var countryCode in ibanCountries) {
+					var o = new Option(countryCode,countryCode);
+					$(o).html(countryCode);
+					$("#ibanGenerateCountry select").append(o);	
+				}
+				// select GB by default
+				$("#ibanGenerateCountry select option[value='GB']").prop('selected', true);
+				$("#ibanGenerateCountry").removeClass("is-loading");
+
+
+				// handle iban validation
+				$("form#ibanValidate").on("submit",function(e){
+					console.log("Validating...");
+					try {
+						var iban = $("input#ibanValidateInput").val();
+						if(validateIban( iban ) ){
+							$("div#ibanValidateOutput").removeClass("is-danger is-invisible").addClass("is-success").html(iban + " looks OK!").show();
+						}
+					} catch(e) {
+						// handle exceptions
+						console.log(e);
+						$("div#ibanValidateOutput").removeClass("is-success is-invisible").addClass("is-danger").html(e).show();
+
+					}
+					e.preventDefault();
+				});
+				// clear output if input changed
+				$("input#ibanValidateInput").on("keyup",function(){
+					$("div#ibanValidateOutput").hide();
+				});
+
+				// handle iban generation
+				$("form#ibanGenerate").on("submit",function(e){
+					console.log("Generating...");
+					try {
+						var data = getFormData($(this));
+						var iban = generateIban( data.country, data.bank, data.sortcode, data.accountNumber	)
+						if( iban ){
+							$("div#ibanGenerateOutput").removeClass("is-danger is-invisible").addClass("is-info").html("IBAN for this account: " + iban).show();
+						}
+					} catch(e) {
+						// handle exceptions
+						console.log(e);
+						$("div#ibanGenerateOutput").removeClass("is-info is-invisible").addClass("is-danger").html(e).show();
+
+					}
+					e.preventDefault();
+				});
+				// clear output if input changed
+				$("form#ibanGenerate :input").on("keyup",function(){
+					$("div#ibanGenerateOutput").hide();
+				});
+				$("#ibanGenerateCountry select").on("change",function(){
+					$("div#ibanGenerateOutput").hide();
+				});
+
+			
+
+			});
+
+			// helper for form inputs
+			function getFormData($form){
+				var unindexed_array = $form.serializeArray();
+				var indexed_array = {};
+				$.map(unindexed_array, function(n, i){
+					indexed_array[n['name']] = n['value'];
+				});
+				return indexed_array;
+			}
+
+		</script>
+	</body>
+</html>
