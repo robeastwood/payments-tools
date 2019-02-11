@@ -97,7 +97,7 @@
 								<div class="field-body">
 									<div class="field">
 										<div class="control has-icons-left">
-											<input name="sortcode" class="input" type="text" placeholder="12-34-56">
+											<input name="sortcode" class="input" type="text" placeholder="123456">
 												<span class="icon is-left">
 												<i class="fas fa-folder"></i>
 											</span>
@@ -205,7 +205,7 @@
 					e.preventDefault();
 				});
 				// clear output if input changed
-				$("form#ibanGenerate :input").on("keyup",function(){
+				$("form#ibanGenerate :input").on("change",function(){
 					$("div#ibanGenerateOutput").hide();
 				});
 				$("#ibanGenerateCountry select").on("change",function(){

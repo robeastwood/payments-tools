@@ -76,6 +76,10 @@ var ibanCountries = {
 
 
 function checkFormat(iban) {
+
+	// check for invalid chars
+	if(/[^\w]/.test(iban)) throw "IBANs can only contain letters and numbers";
+
 	var country = iban.substr(0,2);
 	var formatData = ibanCountries[country];
 	if(!formatData) throw "Country Code '" + country + "' is invalid";
