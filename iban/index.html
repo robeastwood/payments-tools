@@ -183,7 +183,7 @@
 					e.preventDefault();
 				});
 				// clear output if input changed
-				$("input#ibanValidateInput").on("keyup",function(){
+				$("input#ibanValidateInput").on("keydown",function(){
 					$("div#ibanValidateOutput").hide();
 				});
 
@@ -205,7 +205,7 @@
 					e.preventDefault();
 				});
 				// clear output if input changed
-				$("form#ibanGenerate :input").on("change",function(){
+				$("form#ibanGenerate :input").on("keydown",function(){
 					$("div#ibanGenerateOutput").hide();
 				});
 				$("#ibanGenerateCountry select").on("change",function(){
