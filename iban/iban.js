@@ -118,7 +118,7 @@ function validateIban(iban) {
 	checkFormat(iban);
 
 	// check checkdigits are not impossible
-	if(['00','01','99'].includes(iban.substring(2,4))){
+	if(['00','01','99'].indexOf(iban.substring(2,4)) != -1){
 		throw "Impossible checkdigits. Please check!";
 	}
 
