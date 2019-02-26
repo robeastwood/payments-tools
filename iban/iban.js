@@ -148,6 +148,9 @@ function generateIban(countryCode,bankCode,sortcode,accountNumber) {
 	// checkdigits = 98 - remainder of /97
 	var checkdigits = 98 - divmod.remainder.valueOf();
 
+	// pad checkdigits if required
+	if(checkdigits < 10 ) checkdigits = "0" + checkdigits;
+
 	// rebuild IBAN with new checkdigits
 	var iban = countryCode + checkdigits + bankCode + sortcode + accountNumber;
 
